@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Education-Health Connection: A Global Story</title>
+    
+    <!-- D3.js Latest Version -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- D3 Annotation Library -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-annotation@2.5.1/d3-annotation.min.js"></script>
+    
+    <style>
+        /* Modern CSS Variables for Consistent Theming */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #dc2626;
+            --accent-color: #059669;
+            --warning-color: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --background-light: #f8fafc;
+            --background-white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            --max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background: var(--background-white);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-button:hover {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .nav-button.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .scene-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .scene-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scene-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.3);
+        }
+
+        .scene-dot:hover {
+            background: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        /* Scene Container */
+        .scene-container {
+            background: var(--background-white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .scene-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .scene-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Narrative text styling */
+        .narrative-text {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .narrative-text p {
+            margin-bottom: 1rem;
+        }
+
+        .narrative-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .narrative-text strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .narrative-text em {
+            color: var(--secondary-color);
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* Visualization Area */
+        .viz-container {
+            width: 100%;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+
+
+        .viz-svg {
+            width: 100%;
+            height: 100%;
+            background: var(--background-light);
+            border-radius: 8px;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .control-group select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--background-white);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        /* Slider Styling */
+        .control-group input[type="range"] {
+            width: 200px;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            margin: 0.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .control-group input[type="range"]::-moz-range-thumb:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .control-group input[type="range"]::-moz-range-track {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            border: none;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Year display styling */
+        #year-display-1 {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tooltip Styles */
+        .tooltip {
+            position: absolute;
+            background: rgba(31, 41, 55, 0.95);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 250px;
+            line-height: 1.4;
+            z-index: 1000;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        /* Annotation Styles */
+        .annotation-note-label {
+            font-family: var(--font-family);
+            font-size: 12px;
+            fill: var(--text-primary);
+        }
+
+        .annotation-note-title {
+            font-weight: 600;
+            fill: var(--text-primary);
+        }
+
+        .annotation path {
+            stroke: var(--primary-color);
+            stroke-width: 2;
+        }
+
+        .annotation circle {
+            fill: var(--primary-color);
+            stroke: var(--background-white);
+            stroke-width: 2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .container {
+                padding: 1rem 0.5rem;
+            }
+            
+            .scene-container {
+                padding: 1rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .viz-container {
+                height: 400px;
+            }
+        }
+
+        /* Hidden class for scene transitions */
+        .scene-container.hidden {
+            display: none !important;
+        }
+        
+        .scene-container {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>The Education-Health Connection</h1>
+        <p>How comprehensive sexual education and economic development together shape global health outcomes</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Navigation -->
+        <nav class="navigation">
+            <button class="nav-button" id="prev-btn" disabled>← Previous</button>
+            <div class="scene-indicators">
+                <div class="scene-dot active" data-scene="1"></div>
+                <div class="scene-dot" data-scene="2"></div>
+                <div class="scene-dot" data-scene="3"></div>
+            </div>
+            <button class="nav-button" id="next-btn">Next →</button>
+        </nav>
+
+        <!-- Scene 1: Global Landscape -->
+        <section class="scene-container" id="scene-1">
+            <h2 class="scene-title">The Global Landscape</h2>
+            <p class="scene-subtitle">
+                Exploring the relationship between economic development and HIV incidence across the world
+            </p>
+            <div class="narrative-text">
+                <p><strong>The story begins with a surprising paradox:</strong> wealth doesn't automatically guarantee better health outcomes. While we might expect richer countries to have lower HIV incidence rates, the global reality is more complex.</p>
+                <p>This scatter plot reveals that <strong>economic development alone is insufficient</strong> to combat HIV. Some high-income nations face significant challenges, while certain lower-income countries have achieved remarkable success in prevention.</p>
+                <p><em>What makes the difference?</em> The answer lies not just in money, but in how societies invest in education and comprehensive health programs.</p>
+            </div>
+            <div class="viz-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading global health data...
+                </div>
+                <svg class="viz-svg" id="viz-1" style="display: none;"></svg>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="year-slider-1">Year: <span id="year-display-1">2021</span></label>
+                    <input type="range" id="year-slider-1" min="2006" max="2021" value="2021" step="1">
+                </div>
+                <div class="control-group">
+                    <label for="region-select-1">Region:</label>
+                    <select id="region-select-1">
+                        <option value="all">All Regions</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 2: Education Factor -->
+        <section class="scene-container hidden" id="scene-2">
+            <h2 class="scene-title">The Education Factor</h2>
+            <p class="scene-subtitle">
+                How literacy rates and school enrollment correlate with better health outcomes
+            </p>
+            <div class="narrative-text">
+                <p><strong>Education emerges as the crucial bridge</strong> between economic resources and health outcomes. Countries with higher education levels consistently show better HIV prevention results, regardless of their income level.</p>
+                <p>The pattern is clear: <strong>educated populations make better health decisions</strong>. Education empowers people to understand prevention methods, access healthcare services, and make informed choices about their sexual health.</p>
+                <p>Notice how the trend line curves downward – as education increases, HIV incidence decreases. This education-health relationship is stronger and more consistent than the income-health connection we saw earlier. The curved shape reflects our square root scale on the y-axis, which better spreads out the low HIV values for clearer analysis. </p>
+            </div>
+            <div class="viz-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading education data...
+                </div>
+                <svg class="viz-svg" id="viz-2" style="display: none;"></svg>
+            </div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="year-slider-2">Year: <span id="year-display-2">2021</span></label>
+                    <input type="range" id="year-slider-2" min="2006" max="2021" value="2021" step="1">
+                </div>
+                <div class="control-group">
+                    <label for="education-metric">Education Metric:</label>
+                    <select id="education-metric">
+                        <option value="secondary_school_enrollment">Secondary School Enrollment</option>
+                        <option value="adult_literacy_rate">Adult Literacy Rate</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene 3: Behavioral Impact -->
+        <section class="scene-container hidden" id="scene-3">
+            <h2 class="scene-title">Behavioral Impact</h2>
+            <p class="scene-subtitle">
+                The relationship between education, protective behavior, and health outcomes
+            </p>
+            <div class="narrative-text">
+                <p><strong>Here's where education translates into action.</strong> This scene reveals the direct connection between literacy and protective sexual behavior – specifically, condom use among young adults from 2010-2021.</p>
+                <p>Comprehensive sexual education doesn't just provide knowledge; it <strong>empowers young people to protect themselves</strong>. Countries with higher literacy rates consistently show higher rates of condom use, creating a protective effect against HIV transmission.</p>
+                <p>The data tells a compelling story: <em>education saves lives</em> by enabling informed decisions about sexual health. </p>
+            </div>
+            <div class="viz-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading behavioral data...
+                </div>
+                <svg class="viz-svg" id="viz-3" style="display: none;"></svg>
+            </div>
+        </section>
+
+
+    </main>
+
+    <!-- Tooltip for interactive elements -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- JavaScript for Narrative Visualization -->
+    <script src="narrative-viz.js"></script>
+</body>
+</html>
